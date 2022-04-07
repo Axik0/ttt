@@ -158,7 +158,8 @@ def start_session():
                 crossout(winner.moves)
                 counter(curr_sign)
                 scoreboard(count_X, count_O)
-            playbtn['text'] = 'Start!'
+            # playbtn['text'] = 'Start!'
+            playbtn['image'] = pl_img
             fin_flag = g.end
     return winner
 
@@ -170,6 +171,10 @@ window.geometry("350x480")
 window.minsize(350, 480)
 window.maxsize(400, 500)
 
+#icon import and resize (crappy resample quality but PIL doesn't install)
+# cr_img = Image.open("images/cross2.png")
+# cr_img = cr_img.resize((450, 350), Image.ANTIALIAS)
+# cr_img = PhotoImage(cr_img)
 cr_img = PhotoImage(file="images/cross2.png")
 cr_img = cr_img.subsample(27, 27)
 zr_img = PhotoImage(file="images/zero.png")
@@ -264,11 +269,11 @@ record_score.grid(column=0, row=1, columnspan=3, pady=3)
 control_container = LabelFrame(middle_container, text="Action", labelanchor=NE, relief=GROOVE)
 
 playbtn = Button(control_container, image=pl_img, text=" Play! ", command=start_session, width=8)
-playbtn.grid(column=0, row=0, pady=6, padx=3, sticky=N+S+W+E)
+playbtn.grid(column=0, row=0, pady=2, padx=3, sticky=N+S+W+E, ipady=3)
 pass_var = BooleanVar()
 pass_var.set(0)
 passturn = Button(control_container, text="Next", command=lambda: pass_var.set(1), state='disabled', width=8)
-passturn.grid(column=0, row=1, pady=6, padx=3, sticky=N+S+W+E)
+passturn.grid(column=0, row=1, pady=0, padx=3, sticky=N+S+W+E, ipady=3)
 
 
 cfg_container.grid(column=0, row=0, rowspan=2, sticky=N+S+W+E, padx=1)
