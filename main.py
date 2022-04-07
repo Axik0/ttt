@@ -86,7 +86,8 @@ def inverter(first_player):
 
 def setup():
     """collects data from 2 config buttons and draws the playfield"""
-    playbtn['text'] = 'Restart!'
+    # playbtn['text'] = 'Restart!'
+    playbtn['image'] = rl_img
     playfield()
     ch_cross = mode_var.get()
     real_2nd = p2type_var.get()
@@ -161,7 +162,6 @@ def start_session():
             fin_flag = g.end
     return winner
 
-
 window = Tk()
 window.title("TTC game")
 
@@ -170,7 +170,16 @@ window.geometry("350x480")
 window.minsize(350, 480)
 window.maxsize(400, 500)
 
-lbl = Label(window, text="TicTacToe game!", font=("Oswald", 20) )
+cr_img = PhotoImage(file="images/cross2.png")
+cr_img = cr_img.subsample(27, 27)
+zr_img = PhotoImage(file="images/zero.png")
+zr_img = zr_img.subsample(27, 27)
+pl_img = PhotoImage(file="images/play.png")
+pl_img = pl_img.subsample(27, 27)
+rl_img = PhotoImage(file="images/refresh.png")
+rl_img = rl_img.subsample(27, 27)
+
+lbl = Label(window, text="TicTacToe Game", font=("Oswald", 23) )
 lbl.grid(column=0, row=0, columnspan=5, pady=5)
 
 c = Canvas(window, bd=4, relief=GROOVE, height=300, width=300, bg="#fff0fb")
@@ -228,10 +237,10 @@ cfg_container = LabelFrame(middle_container, text="Config", labelanchor=NW, reli
 mode_var = BooleanVar()
 # setting default value
 mode_var.set(1)
-crossbtn = Radiobutton(cfg_container, variable=mode_var, value=1, text='X', font=("Tahoma", 14, 'bold'), indicatoron=0)
+crossbtn = Radiobutton(cfg_container, variable=mode_var, value=1, image=cr_img, text='X', font=("Tahoma", 14, 'bold'), indicatoron=0)
 # crossbtn.grid(column=0, row=1)
 crossbtn.grid(column=0, row=0, padx=1, pady=3)
-zerobtn = Radiobutton(cfg_container, variable=mode_var, value=0, text='O', font=("Tahoma", 14, 'bold'), indicatoron=0)
+zerobtn = Radiobutton(cfg_container, variable=mode_var, value=0, image=zr_img, text='O', font=("Tahoma", 14, 'bold'), indicatoron=0)
 # zerobtn.grid(column=0, row=2)
 zerobtn.grid(column=1, row=0, padx=1, pady=3)
 p2type_var = BooleanVar()
@@ -254,7 +263,7 @@ record_score.grid(column=0, row=1, columnspan=3, pady=3)
 # join 2 control buttons into a single container for better positioning purpose
 control_container = LabelFrame(middle_container, text="Action", labelanchor=NE, relief=GROOVE)
 
-playbtn = Button(control_container, text=" Play! ", command=start_session, width=8)
+playbtn = Button(control_container, image=pl_img, text=" Play! ", command=start_session, width=8)
 playbtn.grid(column=0, row=0, pady=6, padx=3, sticky=N+S+W+E)
 pass_var = BooleanVar()
 pass_var.set(0)
