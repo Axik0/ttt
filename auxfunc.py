@@ -23,13 +23,35 @@ def dist2(a, b):
     return (a[0]-b[0])**2+(a[1]-b[1])**2
 
 
-def distant_subset(list):
+def distant_subset(points):
     result = [[], 0]
-    for pt1 in list:
-        for pt2 in set(list) - {pt1}:
+    for pt1 in points:
+        for pt2 in set(points) - {pt1}:
             test_dist = dist2(pt1, pt2)
             result = [[pt1, pt2], test_dist] if test_dist > result[1] else result
     return result
+
+
+def addon_calc(points):
+    """for each point in points we find addon which will be helpful to cross out its whole cell"""
+    addons = {}
+    diffx = diffy = 0
+    for point in points:
+        base_set = [-1, 0, 1]
+        ax = base_set[point[0]]
+        ay = base_set[point[1]]
+        addons[point] = (ax, ay)
+        diffx = ax - diffx
+        diffy = ay - diffy
+    if not diffx:
+        # x border case
+        for pt in points:
+            addons[pt] = (0, addons[pt][1])
+    elif not diffy:
+        # y - border case
+        for pt in points:
+            addons[pt] = (addons[pt][0], 0)
+    return addons
 
 
 def get_vicinity(point, gset):

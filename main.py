@@ -1,6 +1,6 @@
 from tkinter import *
 from engine import Game
-from auxfunc import line_approximation, update, distant_subset
+from auxfunc import line_approximation, update, distant_subset, addon_calc
 
 # set the globals somehow for technical needs (none for simplicity reason only)
 output_coord, curr_sign, skip_flag, available_moves = None, None, None, []
@@ -10,6 +10,7 @@ count_O, count_X, max_score = 0, 0, update(0)
 
 def visualiser(func):
     """catches mouse click and current global sign var state to draw cross or zero """
+
     def wrapper(*args):
         # we have to run everything else before our code to get output coordinates
         func(*args)
@@ -24,17 +25,20 @@ def visualiser(func):
                 zero(args[0].x // 100, args[0].y // 100)
         else:
             skip_flag = True
+
     return wrapper
 
 
 def interceptor(func):
     """ catches mouse click to transfer its coordinates on canvas to the global var"""
+
     def wrapper(*args):
         # just transfer the args to output
         global output_coord
         output_coord = (args[0].x // 100, args[0].y // 100)
         # print('intercepted')
         func(*args)
+
     return wrapper
 
 
@@ -163,6 +167,7 @@ def start_session():
             fin_flag = g.end
     return winner
 
+
 window = Tk()
 window.title("TTC game")
 
@@ -171,7 +176,7 @@ window.geometry("350x480")
 window.minsize(350, 480)
 window.maxsize(400, 500)
 
-#icon import and resize (crappy resample quality but PIL doesn't install)
+# icon import and resize (crappy resample quality but PIL doesn't install)
 # cr_img = Image.open("images/cross2.png")
 # cr_img = cr_img.resize((450, 350), Image.ANTIALIAS)
 # cr_img = PhotoImage(cr_img)
@@ -184,7 +189,7 @@ pl_img = pl_img.subsample(27, 27)
 rl_img = PhotoImage(file="images/refresh.png")
 rl_img = rl_img.subsample(27, 27)
 
-lbl = Label(window, text="TicTacToe Game", font=("Oswald", 23) )
+lbl = Label(window, text="TicTacToe Game", font=("Oswald", 23))
 lbl.grid(column=0, row=0, columnspan=5, pady=5)
 
 c = Canvas(window, bd=4, relief=GROOVE, height=300, width=300, bg="#fff0fb")
@@ -197,8 +202,8 @@ def playfield():
     """clears all canvas and creates new playfield"""
     c.delete("all")
     for t in range(0, 300, 100):
-        c.create_line(t, 0, t, 300, width=3)
-        c.create_line(0, t, 300, t, width=3)
+        c.create_line(t, -2, t, 302, width=3)
+        c.create_line(-2, t, 302, t, width=3)
 
 
 def zero(x, y):
@@ -220,7 +225,7 @@ def crossout(player_moves):
     """Looks simple at the very first glance but the problem is we don't know a winning pattern, so we have to figure
      it out from winner's moves list. Based on a last move, we restore a whole pattern. To cross it out
      in general, we must find 2 most distant points of 3 in this pattern. Ok, for 3x3 we could set up some conditions
-     but let's try to solve this task in general. Then, we have to sort them to extend a line properly
+     but let's try...a bit better approach. Then, we have to sort them to extend a line properly
      (to cross out a whole cells on sides)"""
     last_point = player_moves[-1]
     result3 = []
@@ -230,9 +235,11 @@ def crossout(player_moves):
             result3 = [point, test]
             break
     result3.append(last_point)
-    endpoints = [(ep[0] * 100 + 50, ep[1] * 100 + 50) for ep in distant_subset(result3)[0]]
-    print(endpoints)
+    max_dist_points = distant_subset(result3)[0]
+    addons = addon_calc(max_dist_points)
+    endpoints = [(ep[0] * 100 + 50 + addons[ep][0]*51, ep[1] * 100 + 50 + addons[ep][1]*51) for ep in max_dist_points]
     c.create_line(endpoints[0][0], endpoints[0][1], endpoints[1][0], endpoints[1][1], width=7, fill='red')
+
 
 middle_container = LabelFrame(window, relief=FLAT)
 cfg_container = LabelFrame(middle_container, text="Config", labelanchor=NW, relief=GROOVE)
@@ -241,10 +248,12 @@ cfg_container = LabelFrame(middle_container, text="Config", labelanchor=NW, reli
 mode_var = BooleanVar()
 # setting default value
 mode_var.set(1)
-crossbtn = Radiobutton(cfg_container, variable=mode_var, value=1, image=cr_img, text='X', font=("Tahoma", 14, 'bold'), indicatoron=0)
+crossbtn = Radiobutton(cfg_container, variable=mode_var, value=1, image=cr_img, text='X', font=("Tahoma", 14, 'bold'),
+                       indicatoron=0)
 # crossbtn.grid(column=0, row=1)
 crossbtn.grid(column=0, row=0, padx=1, pady=3)
-zerobtn = Radiobutton(cfg_container, variable=mode_var, value=0, image=zr_img, text='O', font=("Tahoma", 14, 'bold'), indicatoron=0)
+zerobtn = Radiobutton(cfg_container, variable=mode_var, value=0, image=zr_img, text='O', font=("Tahoma", 14, 'bold'),
+                      indicatoron=0)
 # zerobtn.grid(column=0, row=2)
 zerobtn.grid(column=1, row=0, padx=1, pady=3)
 p2type_var = BooleanVar()
@@ -268,16 +277,15 @@ record_score.grid(column=0, row=1, columnspan=3, pady=3)
 control_container = LabelFrame(middle_container, text="Action", labelanchor=NE, relief=GROOVE)
 
 playbtn = Button(control_container, image=pl_img, text=" Play! ", command=start_session, width=8)
-playbtn.grid(column=0, row=0, pady=2, padx=3, sticky=N+S+W+E, ipady=3)
+playbtn.grid(column=0, row=0, pady=2, padx=3, sticky=N + S + W + E, ipady=3)
 pass_var = BooleanVar()
 pass_var.set(0)
 passturn = Button(control_container, text="Next", command=lambda: pass_var.set(1), state='disabled', width=8)
-passturn.grid(column=0, row=1, pady=0, padx=3, sticky=N+S+W+E, ipady=3)
+passturn.grid(column=0, row=1, pady=0, padx=3, sticky=N + S + W + E, ipady=3)
 
-
-cfg_container.grid(column=0, row=0, rowspan=2, sticky=N+S+W+E, padx=1)
-scoreboard_container.grid(column=1, row=0, rowspan=2, columnspan=3, sticky=N+S+W+E, padx=1)
-control_container.grid(column=4, row=0, rowspan=2, sticky=N+S+W+E, padx=1)
+cfg_container.grid(column=0, row=0, rowspan=2, sticky=N + S + W + E, padx=1)
+scoreboard_container.grid(column=1, row=0, rowspan=2, columnspan=3, sticky=N + S + W + E, padx=1)
+control_container.grid(column=4, row=0, rowspan=2, sticky=N + S + W + E, padx=1)
 middle_container.grid(column=0, row=1, columnspan=5, pady=2)
 
 window.mainloop()
@@ -298,7 +306,6 @@ def interceptor2(func):
         # dealing with output as a string of text to get click's coordinates
         output_coord = (int(output[1]), int(output[4]))
         print('intercepted')
-
     return wrapper
 
 # original idea to visualise turns via eval to convert string to func name (cross/zero)
