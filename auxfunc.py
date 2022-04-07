@@ -18,15 +18,27 @@ ALL_MOVES = {(x, y) for x in range(0, 3) for y in range(0, 3)}
 # set of possible coordinates (on one axis)
 BASE_SET = {int_num for int_num in range(0, 3)}
 
+
+def dist2(a, b):
+    return (a[0]-b[0])**2+(a[1]-b[1])**2
+
+
+def distant_subset(list):
+    result = [[], 0]
+    for pt1 in list:
+        for pt2 in set(list) - {pt1}:
+            test_dist = dist2(pt1, pt2)
+            result = [[pt1, pt2], test_dist] if test_dist > result[1] else result
+    return result
+
+
 def get_vicinity(point, gset):
     """provides a set of points in gset close to the point (not included itself!)"""
-    cx = point[0]
-    cy = point[1]
     vic_set = set()
     # let's prepare a flag just in case, to evade counting len(vic_set) in future
     nonempty_flag = False
     for pt in gset:
-        metrics = ((pt[0] - cx) ** 2 + (pt[1] - cy) ** 2 <= 2) and ((pt[0] - cx) ** 2 + (pt[1] - cy) ** 2 >= 1)
+        metrics = (dist2(pt, point) <= 2) and (dist2(pt, point) >= 1)
         if metrics:
             vic_set.add(pt)
             nonempty_flag = True

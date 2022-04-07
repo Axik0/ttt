@@ -1,6 +1,6 @@
 from tkinter import *
 from engine import Game
-from auxfunc import line_approximation, update
+from auxfunc import line_approximation, update, distant_subset
 
 # set the globals somehow for technical needs (none for simplicity reason only)
 output_coord, curr_sign, skip_flag, available_moves = None, None, None, []
@@ -230,10 +230,9 @@ def crossout(player_moves):
             result3 = [point, test]
             break
     result3.append(last_point)
-
-    # print(endpoints)
-    # c.create_line(endpoints[0][0], endpoints[0][1], endpoints[1][0], endpoints[1][1], width=7, fill='red')
-
+    endpoints = [(ep[0] * 100 + 50, ep[1] * 100 + 50) for ep in distant_subset(result3)[0]]
+    print(endpoints)
+    c.create_line(endpoints[0][0], endpoints[0][1], endpoints[1][0], endpoints[1][1], width=7, fill='red')
 
 middle_container = LabelFrame(window, relief=FLAT)
 cfg_container = LabelFrame(middle_container, text="Config", labelanchor=NW, relief=GROOVE)
