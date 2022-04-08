@@ -99,7 +99,8 @@ def line_approximation(a, b):
         if line(a, b, (pre_appr_x, pre_appr_y))[2]:
             appr_x, appr_y = pre_appr_x, pre_appr_y
         else:
-            print(pre_appr_x, pre_appr_y, "is not on line", a, b)
+            pass
+            # print(pre_appr_x, pre_appr_y, "is not on line", a, b)
     return appr_x, appr_y
 
 
@@ -111,11 +112,13 @@ def update(new_record):
         file = open("last_score.txt", 'w')
     finally:
         file.close()
-    with open("last_score.txt", 'w') as file:
+    with open("last_score.txt", 'r') as file:
         try:
             prev_record = int(file.readline())
         except ValueError:
             prev_record = 0
-        if new_record > prev_record:
+    if new_record > prev_record:
+        prev_record = new_record
+        with open("last_score.txt", 'w') as file:
             file.write(f"{new_record}")
     return prev_record

@@ -52,7 +52,8 @@ def callback(click_event):
     # allows to use next button again
     passturn['text'] = 'Next'
     passturn['state'] = 'normal'
-    # allows to use single clicks for the same purpose
+    passturn.focus_set()
+    # allows using single clicks for the same purpose
     window.bind('<Button-3>', callback_extra)
 
 
@@ -68,6 +69,9 @@ def waiter():
     c.bind('<Double-1>', callback)
     passturn['text'] = 'Click!'
     passturn['state'] = 'disabled'
+    # temporarily change focus to some other object for better ux, let it be the canvas
+    c.focus_set()
+
     window.unbind('<Button-3>')
     # stop until pass_var changes its value (0->1) <==> ensures that we don't proceed without clicking
     # print("waiting...")
@@ -105,8 +109,9 @@ def counter(res_sign):
         count_O += 1
     else:
         count_X += 1
-    max_score = max(count_X, count_O)
-    update(max_score)
+    curr_max_score = max(count_X, count_O)
+    max_score = update(curr_max_score)
+
 
 
 def start_session():
@@ -164,13 +169,14 @@ def start_session():
                 scoreboard(count_X, count_O)
             # playbtn['text'] = 'Start!'
             playbtn['image'] = pl_img
+            playbtn.focus_set()
             fin_flag = g.end
     return winner
 
 
 window = Tk()
-window.title("TTC game")
-
+window.title(" TTC game")
+window.iconphoto(False, PhotoImage(file="images/icon.png"))
 # window.configure(background='black')
 window.geometry("350x480")
 window.minsize(350, 480)
@@ -191,6 +197,56 @@ rl_img = rl_img.subsample(27, 27)
 
 lbl = Label(window, text="TicTacToe Game", font=("Oswald", 23))
 lbl.grid(column=0, row=0, columnspan=5, pady=5)
+
+middle_container = LabelFrame(window, relief=FLAT)
+cfg_container = LabelFrame(middle_container, text="Config", labelanchor=NW, relief=GROOVE)
+
+# we have to set variable type first
+mode_var = BooleanVar()
+# setting default value
+mode_var.set(1)
+crossbtn = Radiobutton(cfg_container, variable=mode_var, value=1, image=cr_img, text='X', font=("Tahoma", 14, 'bold'),
+                       indicatoron=0)
+# crossbtn.grid(column=0, row=1)
+crossbtn.grid(column=0, row=0, padx=1, pady=3)
+zerobtn = Radiobutton(cfg_container, variable=mode_var, value=0, image=zr_img, text='O', font=("Tahoma", 14, 'bold'),
+                      indicatoron=0)
+# zerobtn.grid(column=0, row=2)
+zerobtn.grid(column=1, row=0, padx=1, pady=3)
+p2type_var = BooleanVar()
+p2type_var.set(1)
+p2type_btn = Checkbutton(cfg_container, variable=p2type_var, onvalue=0, offvalue=1, text='PC?', relief=GROOVE)
+p2type_btn.grid(column=0, row=1, columnspan=2, padx=4, pady=5)
+
+# initiate scoreboard with zeros by default
+scoreboard_container = LabelFrame(middle_container, text="Scoreboard", labelanchor=N, relief=GROOVE)
+
+left_score = Label(scoreboard_container, text=f"{count_X:02d}", font=("Tahoma", 20, 'bold'), padx=5)
+left_score.grid(column=0, row=0)
+delimiter = Label(scoreboard_container, text="X vs O", justify=CENTER, font=("Tahoma", 15))
+delimiter.grid(column=1, row=0)
+right_score = Label(scoreboard_container, text=f"{count_O:02d}", font=("Tahoma", 20, 'bold'), padx=5)
+right_score.grid(column=2, row=0)
+record_score = Label(scoreboard_container, text=f"Record:{update(0):2d}", font=("Tahoma", 15))
+record_score.grid(column=0, row=1, columnspan=3, pady=3)
+
+# join 2 control buttons into a single container for better positioning purpose
+control_container = LabelFrame(middle_container, text="Action", labelanchor=NE, relief=GROOVE)
+
+playbtn = Button(control_container, image=pl_img, text=" Play! ", command=start_session, width=8,
+                 relief=RIDGE, borderwidth=0.5)
+playbtn.focus_set()
+playbtn.grid(column=0, row=0, pady=2, padx=3, sticky=N + S + W + E, ipady=3)
+pass_var = BooleanVar()
+pass_var.set(0)
+passturn = Button(control_container, text="Next", command=lambda: pass_var.set(1), state='disabled', width=8,
+                  relief=RIDGE, borderwidth=0.5)
+passturn.grid(column=0, row=1, pady=0, padx=3, sticky=N + S + W + E, ipady=3)
+
+cfg_container.grid(column=0, row=0, rowspan=2, sticky=N + S + W + E, padx=1)
+scoreboard_container.grid(column=1, row=0, rowspan=2, columnspan=3, sticky=N + S + W + E, padx=1)
+control_container.grid(column=4, row=0, rowspan=2, sticky=N + S + W + E, padx=1)
+middle_container.grid(column=0, row=1, columnspan=5, pady=2)
 
 c = Canvas(window, bd=4, relief=GROOVE, height=300, width=300, bg="#fff0fb")
 c.create_text(150, 150, text='Press play button to start\nClick twice to make a move,\nthen a right click to confirm.',
@@ -239,54 +295,6 @@ def crossout(player_moves):
     addons = addon_calc(max_dist_points)
     endpoints = [(ep[0] * 100 + 50 + addons[ep][0]*51, ep[1] * 100 + 50 + addons[ep][1]*51) for ep in max_dist_points]
     c.create_line(endpoints[0][0], endpoints[0][1], endpoints[1][0], endpoints[1][1], width=7, fill='red')
-
-
-middle_container = LabelFrame(window, relief=FLAT)
-cfg_container = LabelFrame(middle_container, text="Config", labelanchor=NW, relief=GROOVE)
-
-# we have to set variable type first
-mode_var = BooleanVar()
-# setting default value
-mode_var.set(1)
-crossbtn = Radiobutton(cfg_container, variable=mode_var, value=1, image=cr_img, text='X', font=("Tahoma", 14, 'bold'),
-                       indicatoron=0)
-# crossbtn.grid(column=0, row=1)
-crossbtn.grid(column=0, row=0, padx=1, pady=3)
-zerobtn = Radiobutton(cfg_container, variable=mode_var, value=0, image=zr_img, text='O', font=("Tahoma", 14, 'bold'),
-                      indicatoron=0)
-# zerobtn.grid(column=0, row=2)
-zerobtn.grid(column=1, row=0, padx=1, pady=3)
-p2type_var = BooleanVar()
-p2type_var.set(1)
-p2type_btn = Checkbutton(cfg_container, variable=p2type_var, onvalue=0, offvalue=1, text='PC?', relief=GROOVE)
-p2type_btn.grid(column=0, row=1, columnspan=2, padx=4, pady=5)
-
-# initiate scoreboard with zeros by default
-scoreboard_container = LabelFrame(middle_container, text="Scoreboard", labelanchor=N, relief=GROOVE)
-
-left_score = Label(scoreboard_container, text=f"{count_X:02d}", font=("Tahoma", 20, 'bold'), padx=5)
-left_score.grid(column=0, row=0)
-delimiter = Label(scoreboard_container, text="X vs O", justify=CENTER, font=("Tahoma", 15))
-delimiter.grid(column=1, row=0)
-right_score = Label(scoreboard_container, text=f"{count_O:02d}", font=("Tahoma", 20, 'bold'), padx=5)
-right_score.grid(column=2, row=0)
-record_score = Label(scoreboard_container, text=f"Record:{max_score:2d}", font=("Tahoma", 15))
-record_score.grid(column=0, row=1, columnspan=3, pady=3)
-
-# join 2 control buttons into a single container for better positioning purpose
-control_container = LabelFrame(middle_container, text="Action", labelanchor=NE, relief=GROOVE)
-
-playbtn = Button(control_container, image=pl_img, text=" Play! ", command=start_session, width=8)
-playbtn.grid(column=0, row=0, pady=2, padx=3, sticky=N + S + W + E, ipady=3)
-pass_var = BooleanVar()
-pass_var.set(0)
-passturn = Button(control_container, text="Next", command=lambda: pass_var.set(1), state='disabled', width=8)
-passturn.grid(column=0, row=1, pady=0, padx=3, sticky=N + S + W + E, ipady=3)
-
-cfg_container.grid(column=0, row=0, rowspan=2, sticky=N + S + W + E, padx=1)
-scoreboard_container.grid(column=1, row=0, rowspan=2, columnspan=3, sticky=N + S + W + E, padx=1)
-control_container.grid(column=4, row=0, rowspan=2, sticky=N + S + W + E, padx=1)
-middle_container.grid(column=0, row=1, columnspan=5, pady=2)
 
 window.mainloop()
 
