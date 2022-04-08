@@ -10,7 +10,6 @@ count_O, count_X, max_score = 0, 0, update(0)
 
 def visualiser(func):
     """catches mouse click and current global sign var state to draw cross or zero """
-
     def wrapper(*args):
         # we have to run everything else before our code to get output coordinates
         func(*args)
@@ -25,20 +24,17 @@ def visualiser(func):
                 zero(args[0].x // 100, args[0].y // 100)
         else:
             skip_flag = True
-
     return wrapper
 
 
 def interceptor(func):
     """ catches mouse click to transfer its coordinates on canvas to the global var"""
-
     def wrapper(*args):
         # just transfer the args to output
         global output_coord
         output_coord = (args[0].x // 100, args[0].y // 100)
         # print('intercepted')
         func(*args)
-
     return wrapper
 
 
@@ -64,12 +60,12 @@ def callback_extra(right_click_event):
 
 
 def waiter():
-    """detects user clicks and waits till click + next button/right click is pressed"""
+    """detects user clicks and waits till click + next button/right click are pressed"""
     # allow getting clicks and disable next button (same for single click) until we get double clicks
     c.bind('<Double-1>', callback)
     passturn['text'] = 'Click!'
     passturn['state'] = 'disabled'
-    # temporarily change focus to some other object for better ux, let it be the canvas
+    # temporarily focus to another object for better ux, let it be the canvas
     c.focus_set()
 
     window.unbind('<Button-3>')
@@ -111,6 +107,13 @@ def counter(res_sign):
         count_X += 1
     curr_max_score = max(count_X, count_O)
     max_score = update(curr_max_score)
+
+
+def scoreboard(x_score, o_score):
+    """updates scoreboard"""
+    left_score['text'] = f"{x_score:02d}"
+    right_score['text'] = f"{o_score:02d}"
+    record_score['text'] = f"Record:{max_score:2d}"
 
 
 def start_session():
@@ -183,7 +186,7 @@ window.iconphoto(False, PhotoImage(file="images/icon.png"))
 window.configure(background=main_color)
 window.geometry("350x488")
 window.minsize(350, 488)
-window.maxsize(400, 500)
+window.maxsize(400, 550)
 
 # icon import and resize (crappy resample quality but PIL doesn't install)
 # cr_img = Image.open("images/cross2.png")
@@ -280,13 +283,6 @@ def zero(x, y):
 
 def cross(x, y):
     c.create_text(50 + x * 100, 50 + y * 100, text="X", font=("Tahoma", 70))
-
-
-def scoreboard(x_score, o_score):
-    """updates scoreboard"""
-    left_score['text'] = f"{x_score:02d}"
-    right_score['text'] = f"{o_score:02d}"
-    record_score['text'] = f"Record:{max_score:2d}"
 
 
 def crossout(player_moves):

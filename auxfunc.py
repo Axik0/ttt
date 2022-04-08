@@ -122,3 +122,5 @@ def update(new_record):
         with open("last_score.txt", 'w') as file:
             file.write(f"{new_record}")
     return prev_record
+
+
