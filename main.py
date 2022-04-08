@@ -113,7 +113,6 @@ def counter(res_sign):
     max_score = update(curr_max_score)
 
 
-
 def start_session():
     """initiates a new game after the play button has been pressed"""
     cfg = setup()
@@ -171,7 +170,6 @@ def start_session():
             playbtn['image'] = pl_img
             playbtn.focus_set()
             fin_flag = g.end
-    return winner
 
 
 window = Tk()
@@ -258,8 +256,8 @@ def playfield():
     """clears all canvas and creates new playfield"""
     c.delete("all")
     for t in range(0, 300, 100):
-        c.create_line(t, -2, t, 302, width=3)
-        c.create_line(-2, t, 302, t, width=3)
+        c.create_line(t, -2, t, 304, width=3, fill="#574e55")
+        c.create_line(-2, t, 304, t, width=3, fill="#574e55")
 
 
 def zero(x, y):
@@ -293,8 +291,10 @@ def crossout(player_moves):
     result3.append(last_point)
     max_dist_points = distant_subset(result3)[0]
     addons = addon_calc(max_dist_points)
-    endpoints = [(ep[0] * 100 + 50 + addons[ep][0]*51, ep[1] * 100 + 50 + addons[ep][1]*51) for ep in max_dist_points]
+    endpoints = [(ep[0] * 100 + 50 + addons[ep][0] * 51, ep[1] * 100 + 50 + addons[ep][1] * 51) for ep in
+                 max_dist_points]
     c.create_line(endpoints[0][0], endpoints[0][1], endpoints[1][0], endpoints[1][1], width=7, fill='red')
+
 
 window.mainloop()
 
@@ -314,6 +314,7 @@ def interceptor2(func):
         # dealing with output as a string of text to get click's coordinates
         output_coord = (int(output[1]), int(output[4]))
         print('intercepted')
+
     return wrapper
 
 # original idea to visualise turns via eval to convert string to func name (cross/zero)
