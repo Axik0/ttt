@@ -1,6 +1,7 @@
 from tkinter import *
 from engine import Game
 from auxfunc import line_approximation, update, distant_subset, addon_calc
+from PIL import Image, ImageTk
 
 # set the globals somehow for technical needs (none for simplicity reason only)
 output_coord, curr_sign, skip_flag, available_moves = None, None, None, []
@@ -182,24 +183,29 @@ canvas_color = '#fff0fb'
 
 window = Tk()
 window.title(" TTC game")
-window.iconphoto(False, PhotoImage(file="images/icon.png"))
+icon = Image.open("images/icon.png")
+icon = icon.resize((35, 35), Image.Resampling.LANCZOS)
+icon_tk = ImageTk.PhotoImage(icon)
+window.iconphoto(False, icon_tk)
 window.configure(background=main_color)
 window.geometry("350x488")
 window.minsize(350, 488)
 window.maxsize(400, 550)
 
-# icon import and resize (crappy resample quality but PIL doesn't install)
-# cr_img = Image.open("images/cross2.png")
-# cr_img = cr_img.resize((450, 350), Image.ANTIALIAS)
-# cr_img = PhotoImage(cr_img)
-cr_img = PhotoImage(file="images/cross2.png")
-cr_img = cr_img.subsample(27, 27)
-zr_img = PhotoImage(file="images/zero.png")
-zr_img = zr_img.subsample(27, 27)
-pl_img = PhotoImage(file="images/play.png")
-pl_img = pl_img.subsample(27, 27)
-rl_img = PhotoImage(file="images/refresh.png")
-rl_img = rl_img.subsample(27, 27)
+
+
+cr_img = Image.open("images/cross2.png")
+cr_img = cr_img.resize((27, 27), Image.Resampling.LANCZOS)
+cr_img = ImageTk.PhotoImage(cr_img)
+zr_img = Image.open("images/zero.png")
+zr_img = zr_img.resize((27, 27), Image.Resampling.LANCZOS)
+zr_img = ImageTk.PhotoImage(zr_img)
+pl_img = Image.open("images/play.png")
+pl_img = pl_img.resize((27, 27), Image.Resampling.LANCZOS)
+pl_img = ImageTk.PhotoImage(pl_img)
+rl_img = Image.open("images/refresh.png")
+rl_img = rl_img.resize((27, 27), Image.Resampling.LANCZOS)
+rl_img = ImageTk.PhotoImage(rl_img)
 
 lbl = Label(window, text="TicTacToe Game", font=("Oswald", 23), background=main_color)
 lbl.grid(column=0, row=0, columnspan=5, pady=5)
